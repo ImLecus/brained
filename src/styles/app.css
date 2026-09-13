@@ -1,0 +1,77 @@
+:root {
+  font-family: monospace,"Inter", system-ui, -apple-system, sans-serif;
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--app-background);
+  color: var(--foreground);
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+.shell {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--app-background);
+}
+
+.topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+}
+
+.brand {
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0.5rem;
+}
+
+.topbar-action {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topbar-action:hover {
+  color: var(--foreground);
+}
+
+.workspace {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.graph-pane {
+  position: absolute;
+  inset: 0;
+}

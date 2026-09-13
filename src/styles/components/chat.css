@@ -1,0 +1,121 @@
+.chat {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30vw;
+  min-width: 500px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid var(--line);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chat-empty {
+  color: var(--muted);
+  align-self: center;
+  padding-top: 3rem;
+}
+
+.chat-message {
+  max-width: 90%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: var(--foreground);
+  color: var(--contrast);
+}
+
+.chat-message.agent {
+  align-self: flex-start;
+  background: var(--line);
+}
+
+.chat-loading {
+  display: flex;
+  gap: 0.3rem;
+  align-self: flex-start;
+  padding: 0.8rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--line);
+}
+
+.chat-loading span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--foreground);
+  animation: chat-bounce 1.2s ease-in-out infinite;
+}
+
+.chat-loading span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.chat-loading span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes chat-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-0.4rem);
+  }
+}
+
+.chat-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.chat-form textarea {
+  resize: vertical;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--foreground);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font: inherit;
+}
+
+.chat-form button {
+  align-self: flex-end;
+  border: none;
+  background: var(--foreground);
+  color: var(--contrast);
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.chat-form button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
