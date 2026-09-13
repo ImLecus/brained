@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useChat } from "../hooks/useChat";
 import { useI18n } from "../hooks/useI18n";
+import { SendIcon } from "./SendIcon";
 
 interface ChatPanelProps {
   onFilesChanged: () => void;
@@ -9,7 +10,7 @@ interface ChatPanelProps {
 
 export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
   const { t } = useI18n();
-  const { messages, responding, send } = useChat(onFilesChanged);
+  const { messages, responding, notice, send } = useChat(onFilesChanged);
   const [draft, setDraft] = useState("");
   const lastMessage = messages[messages.length - 1];
   const showIndicator =
@@ -44,6 +45,7 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
           </li>
         )}
       </ul>
+      {notice && <p className="chat-notice">{t(notice)}</p>}
       <form className="chat-form" onSubmit={submit}>
         <textarea
           value={draft}
@@ -58,6 +60,7 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
           }}
         />
         <button type="submit" disabled={responding || draft.trim().length === 0}>
+          <SendIcon />
           {t("chat.send")}
         </button>
       </form>

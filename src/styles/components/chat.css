@@ -87,6 +87,14 @@
   }
 }
 
+.chat-notice {
+  margin: 0 1.5rem 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  color: var(--muted);
+}
+
 .chat-form {
   display: flex;
   flex-direction: column;
@@ -107,12 +115,16 @@
 
 .chat-form button {
   align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border: none;
   background: var(--foreground);
   color: var(--contrast);
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0;
   cursor: pointer;
+  gap: 10px;
 }
 
 .chat-form button:disabled {

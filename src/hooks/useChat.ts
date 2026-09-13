@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import type { ChatMessage } from "../../shared/types";
 import { sendMessage } from "../api/client";
+import type { ChatMessage } from "../../shared/types";
+import type { I18nKey } from "../i18n";
 
 interface TextPart {
   messageID: string;
   text: string;
+  replace: boolean;
 }
 
 interface MessageInfo {
@@ -19,22 +21,38 @@ function extractText(event: unknown): TextPart | null {
   const value = event as {
     type?: string;
     properties?: {
-      part?: { type?: string; text?: string; messageID?: string };
+      messageID?: string;
+      field?: string;
       delta?: string;
+      part?: { type?: string; text?: string; messageID?: string };
     };
   };
-  if (value.type !== "message.part.updated") {
+  const properties = value.properties;
+  if (!properties) {
     return null;
   }
-  const part = value.properties?.part;
-  if (part?.type !== "text") {
-    return null;
+  if (value.type === "message.part.delta") {
+    if (
+      properties.field !== "text" ||
+      typeof properties.messageID !== "string" ||
+      typeof properties.delta !== "string"
+    ) {
+      return null;
+    }
+    return { messageID: properties.messageID, text: properties.delta, replace: false };
   }
-  const text = typeof value.properties?.delta === "string" ? value.properties.delta : part.text;
-  if (typeof text !== "string" || typeof part?.messageID !== "string") {
-    return null;
+  if (value.type === "message.part.updated") {
+    const part = properties.part;
+    if (
+      part?.type !== "text" ||
+      typeof part.messageID !== "string" ||
+      typeof part.text !== "string"
+    ) {
+      return null;
+    }
+    return { messageID: part.messageID, text: part.text, replace: true };
   }
-  return { messageID: part.messageID, text };
+  return null;
 }
 
 function messageRole(event: unknown): MessageInfo | null {
@@ -56,17 +74,53 @@ function messageRole(event: unknown): MessageInfo | null {
 }
 
 function isFileChange(event: unknown): boolean {
-  return !!event && typeof event === "object" && (event as { type?: string }).type === "file.watcher.updated";
+  if (!event || typeof event !== "object") {
+    return false;
+  }
+  const type = (event as { type?: string }).type;
+  return type === "file.edited" || type === "file.watcher.updated";
 }
 
 export function useChat(onFilesChanged: () => void) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [responding, setResponding] = useState(false);
+  const [notice, setNotice] = useState<I18nKey | null>(null);
   const parts = useRef(new Map<string, string>());
   const roles = useRef(new Map<string, string>());
   const sentTexts = useRef(new Set<string>());
+  const pendingParts = useRef(new Map<string, string>());
+  const flushRaf = useRef(0);
   const onFilesChangedRef = useRef(onFilesChanged);
   onFilesChangedRef.current = onFilesChanged;
+
+  const enqueue = (messageID: string, content: string) => {
+    if (content.length === 0) {
+      return;
+    }
+    pendingParts.current.set(messageID, content);
+    if (flushRaf.current === 0) {
+      flushRaf.current = requestAnimationFrame(() => {
+        flushRaf.current = 0;
+        const updates = pendingParts.current;
+        pendingParts.current = new Map();
+        if (updates.size === 0) {
+          return;
+        }
+        setMessages((current) => {
+          const next = [...current];
+          for (const [messageID, content] of updates) {
+            const index = next.findIndex((item) => item.id === messageID);
+            if (index >= 0) {
+              next[index] = { ...next[index], content };
+            } else {
+              next.push({ id: messageID, role: "agent", content });
+            }
+          }
+          return next;
+        });
+      });
+    }
+  };
 
   useEffect(() => {
     const source = new EventSource("/api/chat/events");
@@ -84,21 +138,15 @@ export function useChat(onFilesChanged: () => void) {
       }
       const part = extractText(event);
       if (part) {
-        const { messageID, text } = part;
-        const accumulated = (parts.current.get(messageID) ?? "") + text;
+        const { messageID, text, replace } = part;
+        const accumulated = replace
+          ? text
+          : (parts.current.get(messageID) ?? "") + text;
         if (roles.current.get(messageID) === "user" || sentTexts.current.has(accumulated)) {
           return;
         }
         parts.current.set(messageID, accumulated);
-        setMessages((current) => {
-          const index = current.findIndex((item) => item.id === messageID);
-          if (index >= 0) {
-            const next = [...current];
-            next[index] = { ...next[index], content: accumulated };
-            return next;
-          }
-          return [...current, { id: messageID, role: "agent", content: accumulated }];
-        });
+        enqueue(messageID, accumulated);
         return;
       }
       if (isFileChange(event)) {
@@ -107,6 +155,10 @@ export function useChat(onFilesChanged: () => void) {
     };
     return () => {
       source.close();
+      if (flushRaf.current !== 0) {
+        cancelAnimationFrame(flushRaf.current);
+        flushRaf.current = 0;
+      }
     };
   }, []);
 
@@ -115,9 +167,15 @@ export function useChat(onFilesChanged: () => void) {
     if (content.length === 0 || responding) {
       return;
     }
+    setNotice(null);
     sentTexts.current.add(content);
     parts.current.clear();
     roles.current.clear();
+    pendingParts.current.clear();
+    if (flushRaf.current !== 0) {
+      cancelAnimationFrame(flushRaf.current);
+      flushRaf.current = 0;
+    }
     setMessages((current) => [
       ...current,
       { id: crypto.randomUUID(), role: "user", content },
@@ -125,10 +183,13 @@ export function useChat(onFilesChanged: () => void) {
     setResponding(true);
     try {
       await sendMessage(content);
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      setNotice(code === "session_reset" ? "chat.sessionReset" : "chat.error");
     } finally {
       setResponding(false);
     }
   };
 
-  return { messages, responding, send };
+  return { messages, responding, notice, send };
 }
