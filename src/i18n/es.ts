@@ -1,0 +1,25 @@
+export const es = {
+  "app.name": "Brained",
+  "settings.title": "Configuración",
+  "settings.vault": "Bóveda (raíz)",
+  "settings.instructions": "AGENTS.md",
+  "settings.model": "Modelo",
+  "settings.language": "Idioma",
+  "settings.theme": "Tema",
+  "settings.save": "Guardar",
+  "settings.cancel": "Cancelar",
+  "chat.placeholder": "Habla con el agente de tu bóveda…",
+  "chat.send": "Enviar",
+  "chat.stop": "Detener",
+  "chat.empty": "Empieza a escribir para hablar con el agente.",
+  "chat.sessionReset": "El agente no respondió; se ha reiniciado su sesión. Reenvía tu mensaje.",
+  "chat.promptTimeout": "El agente tardó demasiado en responder y se ha reiniciado su sesión. Reenvía tu mensaje.",
+  "chat.aborted": "Respuesta interrumpida.",
+  "chat.abortFailed": "No se pudo interrumpir al agente.",
+  "chat.error": "El agente falló. Revisa el modelo configurado y tu conexión, e inténtalo de nuevo.",
+  "node.loading": "Cargando el archivo…",
+  "node.empty": "El archivo no tiene contenido.",
+  "node.close": "Cerrar",
+} as const;
+
+export type I18nKey = keyof typeof es;

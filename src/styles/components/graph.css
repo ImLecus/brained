@@ -1,0 +1,14 @@
+.graph-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+.graph-area:active {
+  cursor: grabbing;
+}
+
+.graph-area.zooming {
+  cursor: zoom-in;
+}

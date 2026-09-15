@@ -1,0 +1,6 @@
+.private
+node_modules
+dist
+dist-server
+*.log
+release
