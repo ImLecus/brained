@@ -1,5 +1,5 @@
 :root[data-theme="light"] {
-  --app-background: linear-gradient(180deg, #ffffff 0%, #ececec 100%);
+  --app-background: linear-gradient(180deg, #ececec 0%, #dddddd 100%);
   --surface: #ebebeb;
   --foreground: #0d0d0d;
   --contrast: #ebebeb;

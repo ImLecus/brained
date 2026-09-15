@@ -2,6 +2,6 @@
   "vaultPath": "../../Segundo Cerebro/secondBrain",
   "instructionsPath": "../../Segundo Cerebro/AGENTS.md",
   "model": "opencode/big-pickle",
-  "language": "es",
+  "language": "en",
   "theme": "dark"
 }

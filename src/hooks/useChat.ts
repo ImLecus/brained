@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { sendMessage } from "../api/client";
+import { abortChat, sendMessage } from "../api/client";
 import type { ChatMessage } from "../../shared/types";
-import type { I18nKey } from "../i18n";
+import { useI18n } from "./useI18n";
 
 interface TextPart {
   messageID: string;
@@ -82,14 +82,17 @@ function isFileChange(event: unknown): boolean {
 }
 
 export function useChat(onFilesChanged: () => void) {
+  const { t } = useI18n();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [responding, setResponding] = useState(false);
-  const [notice, setNotice] = useState<I18nKey | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const parts = useRef(new Map<string, string>());
   const roles = useRef(new Map<string, string>());
   const sentTexts = useRef(new Set<string>());
   const pendingParts = useRef(new Map<string, string>());
   const flushRaf = useRef(0);
+  const queue = useRef<string[]>([]);
+  const active = useRef(false);
   const onFilesChangedRef = useRef(onFilesChanged);
   onFilesChangedRef.current = onFilesChanged;
 
@@ -164,11 +167,25 @@ export function useChat(onFilesChanged: () => void) {
 
   const send = async (text: string): Promise<void> => {
     const content = text.trim();
-    if (content.length === 0 || responding) {
+    if (content.length === 0) {
       return;
     }
     setNotice(null);
     sentTexts.current.add(content);
+    setMessages((current) => [
+      ...current,
+      { id: crypto.randomUUID(), role: "user", content },
+    ]);
+    if (active.current) {
+      queue.current.push(content);
+      return;
+    }
+    active.current = true;
+    void run(content);
+  };
+
+  const run = async (content: string): Promise<void> => {
+    setResponding(true);
     parts.current.clear();
     roles.current.clear();
     pendingParts.current.clear();
@@ -176,20 +193,42 @@ export function useChat(onFilesChanged: () => void) {
       cancelAnimationFrame(flushRaf.current);
       flushRaf.current = 0;
     }
-    setMessages((current) => [
-      ...current,
-      { id: crypto.randomUUID(), role: "user", content },
-    ]);
-    setResponding(true);
     try {
       await sendMessage(content);
     } catch (error) {
       const code = (error as { code?: string }).code;
-      setNotice(code === "session_reset" ? "chat.sessionReset" : "chat.error");
+      const message = (error as { message?: string }).message;
+      if (code === "session_reset") {
+        setNotice(t("chat.sessionReset"));
+      } else if (code === "prompt_timeout") {
+        setNotice(t("chat.promptTimeout"));
+      } else if (code === "aborted") {
+        setNotice(t("chat.aborted"));
+      } else {
+        setNotice(message && message !== code ? message : t("chat.error"));
+      }
     } finally {
-      setResponding(false);
+      const next = queue.current.shift();
+      if (next !== undefined) {
+        void run(next);
+      } else {
+        active.current = false;
+        setResponding(false);
+      }
     }
   };
 
-  return { messages, responding, notice, send };
+  const abort = async (): Promise<void> => {
+    if (!active.current) {
+      return;
+    }
+    setNotice(null);
+    try {
+      await abortChat();
+    } catch {
+      setNotice(t("chat.abortFailed"));
+    }
+  };
+
+  return { messages, responding, notice, send, abort };
 }

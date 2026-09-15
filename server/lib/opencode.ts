@@ -1,6 +1,6 @@
 import { createOpencode } from "@opencode-ai/sdk";
 import { createServer } from "node:net";
-import type { EventBus } from "./events";
+import type { EventBus } from "./events.js";
 
 export type OpenCodeInstance = Awaited<ReturnType<typeof createOpencode>>;
 
@@ -25,6 +25,7 @@ function freePort(): Promise<number> {
 export class AgentService {
   private manager: OpenCodeInstance | null = null;
   private model: string | null = null;
+  private directory: string | null = null;
 
   constructor(private events: EventBus) {
     process.once("exit", () => this.manager?.server.close());
@@ -32,8 +33,8 @@ export class AgentService {
     process.once("SIGTERM", () => this.manager?.server.close());
   }
 
-  async ensure(model: string): Promise<OpenCodeInstance> {
-    if (this.manager && this.model === model) {
+  async ensure(model: string, directory: string): Promise<OpenCodeInstance> {
+    if (this.manager && this.model === model && this.directory === directory) {
       return this.manager;
     }
     this.manager?.server.close();
@@ -48,6 +49,7 @@ export class AgentService {
     void forward();
     this.manager = manager;
     this.model = model;
+    this.directory = directory;
     return manager;
   }
 }

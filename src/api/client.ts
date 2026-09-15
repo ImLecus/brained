@@ -7,6 +7,7 @@ interface ApiError extends Error {
 interface ChatResponse {
   ok: boolean;
   error?: string;
+  message?: string;
 }
 
 async function json<T>(url: string, init?: RequestInit): Promise<T> {
@@ -14,10 +15,15 @@ async function json<T>(url: string, init?: RequestInit): Promise<T> {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
-  const payload = await response.json().catch(() => null) as { error?: string } | null;
+  const payload = await response.json().catch(() => null) as {
+    error?: string;
+    message?: string;
+  } | null;
   if (!response.ok) {
     const error = new Error(
-      payload?.error ?? `request ${url} failed with status ${response.status}`,
+      payload?.message ??
+        payload?.error ??
+        `request ${url} failed with status ${response.status}`,
     ) as ApiError;
     error.code = payload?.error;
     throw error;
@@ -50,8 +56,12 @@ export async function sendMessage(text: string): Promise<void> {
     body: JSON.stringify({ text }),
   });
   if (!result.ok) {
-    const error = new Error(result.error ?? "chat failed") as ApiError;
+    const error = new Error(result.message ?? result.error ?? "chat failed") as ApiError;
     error.code = result.error;
     throw error;
   }
+}
+
+export function abortChat(): Promise<ChatResponse> {
+  return json<ChatResponse>("/api/chat/abort", { method: "POST" });
 }

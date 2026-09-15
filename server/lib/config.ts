@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import type { AppConfig } from "../../shared/types";
+import type { AppConfig } from "../../shared/types.ts";
 
 export const CONFIG_PATH = resolve("config.json");
 

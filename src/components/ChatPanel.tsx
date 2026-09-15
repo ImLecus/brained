@@ -10,7 +10,7 @@ interface ChatPanelProps {
 
 export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
   const { t } = useI18n();
-  const { messages, responding, notice, send } = useChat(onFilesChanged);
+  const { messages, responding, notice, send, abort } = useChat(onFilesChanged);
   const [draft, setDraft] = useState("");
   const lastMessage = messages[messages.length - 1];
   const showIndicator =
@@ -45,7 +45,7 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
           </li>
         )}
       </ul>
-      {notice && <p className="chat-notice">{t(notice)}</p>}
+      {notice && <p className="chat-notice">{notice}</p>}
       <form className="chat-form" onSubmit={submit}>
         <textarea
           value={draft}
@@ -59,10 +59,17 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
             }
           }}
         />
-        <button type="submit" disabled={responding || draft.trim().length === 0}>
-          <SendIcon />
-          {t("chat.send")}
-        </button>
+        <div className="chat-actions">
+          {responding && (
+            <button type="button" className="chat-stop" onClick={() => void abort()}>
+              {t("chat.stop")}
+            </button>
+          )}
+          <button type="submit" disabled={draft.trim().length === 0}>
+            <SendIcon />
+            {t("chat.send")}
+          </button>
+        </div>
       </form>
     </aside>
   );

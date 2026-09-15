@@ -1,12 +1,12 @@
 import { readFile } from "node:fs/promises";
-import { isAbsolute, join, relative } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import type { AppConfig } from "../../shared/types";
-import { saveConfig } from "../lib/config";
-import { invalidateVault, parseVault } from "../lib/vault";
-import type { EventBus } from "../lib/events";
-import type { AgentService } from "../lib/opencode";
-import { ChatManager, StuckSessionError } from "../lib/chat";
+import type { AppConfig } from "../../shared/types.js";
+import { saveConfig } from "../lib/config.js";
+import { invalidateVault, parseVault } from "../lib/vault.js";
+import type { EventBus } from "../lib/events.js";
+import type { AgentService } from "../lib/opencode.js";
+import { ChatManager, StuckSessionError, PromptTimeoutError, AgentAbortError } from "../lib/chat.js";
 
 interface ApiDeps {
   config: AppConfig;
@@ -19,7 +19,7 @@ interface ChatBody {
 }
 
 export async function registerApi(app: FastifyInstance, deps: ApiDeps): Promise<void> {
-  const chat = new ChatManager();
+  const chat = new ChatManager(deps.events);
   deps.events.subscribe((event) => {
     const type = (event as { type?: string }).type;
     if (type === "file.edited" || type === "file.watcher.updated") {
@@ -64,13 +64,29 @@ export async function registerApi(app: FastifyInstance, deps: ApiDeps): Promise<
       return reply.code(400).send({ error: "text is required" });
     }
     try {
-      await chat.send(deps.agents, deps.config.model, text);
+      await chat.send(
+        deps.agents,
+        deps.config.model,
+        text,
+        resolve(deps.config.vaultPath),
+      );
     } catch (error) {
       if (error instanceof StuckSessionError) {
         return reply.send({ ok: false, error: "session_reset" });
       }
-      return reply.code(500).send({ error: String(error) });
+      if (error instanceof PromptTimeoutError) {
+        return reply.send({ ok: false, error: "prompt_timeout" });
+      }
+      if (error instanceof AgentAbortError) {
+        return reply.send({ ok: false, error: "aborted" });
+      }
+      return reply.send({ ok: false, error: "agent_error", message: String(error) });
     }
+    return { ok: true };
+  });
+
+  app.post("/api/chat/abort", async () => {
+    await chat.abort();
     return { ok: true };
   });
 

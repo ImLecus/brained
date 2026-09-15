@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { basename, extname, relative } from "node:path";
 import fg from "fast-glob";
-import type { GraphData, GraphLink, GraphNode } from "../../shared/types";
+import type { GraphData, GraphLink, GraphNode } from "../../shared/types.js";
 
 const WIKILINK_PATTERN = /\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]/g;
 const IGNORED = ["**/node_modules/**", "**/dist/**", "**/.git/**"];

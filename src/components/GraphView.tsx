@@ -12,8 +12,8 @@ interface GraphViewProps {
   onNodeClick: (node: GraphNode) => void;
 }
 
-const CHARGE = 1000;
-const MIN_ZOOM = 0.25;
+const CHARGE = 70;
+const MIN_ZOOM = 0.01;
 const MAX_ZOOM = 8;
 const ZOOM_EASE = 0.32;
 const WHEEL_SENSITIVITY = 0.0016;
@@ -21,7 +21,7 @@ const MIDDLE_SENSITIVITY = 0.003;
 const FRICTION = 0.9;
 const PAN_SMOOTHING = 0.55;
 const PAN_THRESHOLD = 4;
-const NODE_REL_SIZE = 4;
+const NODE_REL_SIZE = 5;
 const HALO_PADDING = 3;
 const BASE_LINK_DISTANCE = 48;
 const DEGREE_SPACING = 3;
@@ -38,14 +38,17 @@ function clampZoom(value: number): number {
 }
 
 function sizeValue(degree: number): number {
-  return degree * 0.1 + 0.5;
+  return degree * 0.6 + 4;
 }
 
 function degreeMap(graph: GraphData) {
   const degrees = new Map<string, number>();
   for (const link of graph.links) {
     for (const end of [link.source, link.target]) {
-      const id = String(end);
+      const id = endId(end);
+      if (id === null) {
+        continue;
+      }
       degrees.set(id, (degrees.get(id) ?? 0) + 1);
     }
   }
@@ -80,6 +83,7 @@ interface Camera {
   vx: number;
   vy: number;
   raf: number;
+  touched: boolean;
   pan: null | {
     startX: number;
     startY: number;
@@ -107,6 +111,7 @@ export const GraphView = memo(function GraphView({
     vx: 0,
     vy: 0,
     raf: 0,
+    touched: false,
     pan: null,
     middle: null,
   });
@@ -274,6 +279,7 @@ export const GraphView = memo(function GraphView({
     };
 
     const down = (event: MouseEvent) => {
+      cam.touched = true;
       if (event.button === 1) {
         event.preventDefault();
         if (!cam.middle) {
@@ -342,6 +348,7 @@ export const GraphView = memo(function GraphView({
 
     const wheel = (event: WheelEvent) => {
       event.preventDefault();
+      cam.touched = true;
       if (cam.pan || cam.middle) {
         return;
       }
@@ -396,6 +403,28 @@ export const GraphView = memo(function GraphView({
     };
   }, []);
 
+  const fitToView = useCallback(() => {
+    if (camera.current.touched || graph.nodes.length <= 1) {
+      return;
+    }
+    const handle = graphRef.current;
+    if (!handle) {
+      return;
+    }
+    window.setTimeout(() => {
+      if (camera.current.touched) {
+        return;
+      }
+      handle.zoomToFit(0, 70);
+      const center = handle.centerAt();
+      const fittedK = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, handle.zoom()));
+      handle.zoom(fittedK);
+      handle.centerAt(center.x, center.y);
+      camera.current.view = { k: fittedK, cx: center.x, cy: center.y };
+      camera.current.targetK = fittedK;
+    }, 0);
+  }, [graph]);
+
   return (
     <div ref={container} className="graph-area">
       {size.width > 0 && size.height > 0 && (
@@ -420,6 +449,7 @@ export const GraphView = memo(function GraphView({
           maxZoom={MAX_ZOOM}
           enableZoomInteraction={false}
           enablePanInteraction={false}
+          onEngineStop={fitToView}
           onNodeDrag={() => {
             nodeDragging.current = true;
           }}
