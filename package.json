@@ -1,9 +1,15 @@
 {
-  "name": "brained",
+"name": "brained",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "electron/main.cjs",
+  "description": "AI powered second brain with a force-directed graph and a conversational agent over a Markdown vault",
+  "author": {
+    "name": "ImLecus",
+    "email": "ImLecus@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/ImLecus/brained",
   "scripts": {
     "dev": "concurrently -k -n server,client -c blue,green \"npm:dev:server\" \"npm:dev:client\"",
     "dev:server": "tsx watch server/index.ts",
@@ -54,18 +60,23 @@
     ],
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "deb",
+        "tar.gz"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "maintainer": "ImLecus <ImLecus@users.noreply.github.com>"
     },
     "win": {
       "target": [
-        "portable"
+        "portable",
+        "nsis"
       ]
     },
     "mac": {
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ]
     }
   }
