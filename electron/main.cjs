@@ -142,6 +142,13 @@ if (!app.requestSingleInstanceLock()) {
     window.once("ready-to-show", () => window.show());
     window.on("closed", () => app.quit());
 
+    window.webContents.on("before-input-event", (event, input) => {
+      if (input.type === "keyDown" && input.key === "F11") {
+        event.preventDefault();
+        window.setFullScreen(!window.isFullScreen());
+      }
+    });
+
     if (!app.isPackaged) {
       globalShortcut.register("F12", () => window.webContents.toggleDevTools());
     }
