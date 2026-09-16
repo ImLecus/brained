@@ -215,7 +215,7 @@ export class BrainService {
     if (!this.current) {
       return;
     }
-    const discovered = await fg("**/*.md", {
+    const discovered = await fg("**/*.{md,csv}", {
       cwd: this.current.workDir,
       absolute: false,
       ignore: ["**/node_modules/**", "**/.git/**", "AGENTS.md"],

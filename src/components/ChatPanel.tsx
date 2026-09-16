@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { useChat } from "../hooks/useChat";
 import { useI18n } from "../hooks/useI18n";
 import { useResizablePanel } from "../hooks/useResizablePanel";
+import { MarkdownRenderer } from "./renderer/MarkdownRenderer";
 import { SendIcon } from "./SendIcon";
 
 interface ChatPanelProps {
@@ -44,7 +45,11 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
         )}
         {messages.map((message) => (
           <li key={message.id} className={`chat-message ${message.role}`}>
-            {message.content}
+            {message.role === "agent" ? (
+              <MarkdownRenderer text={message.content} />
+            ) : (
+              message.content
+            )}
           </li>
         ))}
         {showIndicator && (

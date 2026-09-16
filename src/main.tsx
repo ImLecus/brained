@@ -8,6 +8,7 @@ import "./styles/components/chat.css";
 import "./styles/components/settings.css";
 import "./styles/components/node.css";
 import "./styles/components/brain.css";
+import "./styles/components/renderer.css";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
