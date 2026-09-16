@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { isAbsolute, join, relative } from "node:path";
 import type { FastifyInstance, FastifyRequest } from "fastify";
 import type { AppConfig } from "../../shared/types.js";
-import { saveConfig } from "../lib/config.js";
+import { saveConfig, VAULT_DIR } from "../lib/config.js";
 import { invalidateVault, parseVault } from "../lib/vault.js";
 import type { EventBus } from "../lib/events.js";
 import type { AgentService } from "../lib/opencode.js";
@@ -23,23 +23,23 @@ export async function registerApi(app: FastifyInstance, deps: ApiDeps): Promise<
   deps.events.subscribe((event) => {
     const type = (event as { type?: string }).type;
     if (type === "file.edited" || type === "file.watcher.updated") {
-      invalidateVault(deps.config.vaultPath);
+      invalidateVault(VAULT_DIR);
     }
   });
 
-  app.get("/api/graph", async () => parseVault(deps.config.vaultPath));
+  app.get("/api/graph", async () => parseVault(VAULT_DIR));
 
   app.get("/api/node", async (
     request: FastifyRequest<{ Querystring: { path?: string } }>,
     reply,
   ) => {
     const rel = request.query.path ?? "";
-    const escaped = relative(deps.config.vaultPath, join(deps.config.vaultPath, rel));
+    const escaped = relative(VAULT_DIR, join(VAULT_DIR, rel));
     if (rel.length === 0 || escaped.startsWith("..") || isAbsolute(escaped)) {
       return reply.code(400).send({ error: "invalid path" });
     }
     try {
-      const resolved = join(deps.config.vaultPath, rel);
+      const resolved = join(VAULT_DIR, rel);
       const content = await readFile(resolved, "utf8");
       return reply.send({ path: rel, content });
     } catch (error) {
@@ -50,7 +50,11 @@ export async function registerApi(app: FastifyInstance, deps: ApiDeps): Promise<
   app.get("/api/config", async () => deps.config);
 
   app.put("/api/config", async (request: FastifyRequest<{ Body: Partial<AppConfig> }>) => {
-    Object.assign(deps.config, request.body);
+    const next = request.body;
+    const stale = next as Partial<AppConfig> & { instructionsPath?: string; vaultPath?: string };
+    delete stale.instructionsPath;
+    delete stale.vaultPath;
+    Object.assign(deps.config, next);
     await saveConfig(deps.config);
     return deps.config;
   });
@@ -68,7 +72,7 @@ export async function registerApi(app: FastifyInstance, deps: ApiDeps): Promise<
         deps.agents,
         deps.config.model,
         text,
-        resolve(deps.config.vaultPath),
+        VAULT_DIR,
       );
     } catch (error) {
       if (error instanceof StuckSessionError) {

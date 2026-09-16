@@ -7,8 +7,6 @@ const { join } = require("node:path");
 const READY_TIMEOUT = 15000;
 
 const DEFAULT_CONFIG = {
-  vaultPath: "",
-  instructionsPath: "AGENTS.md",
   model: "opencode/big-pickle",
   language: "es",
   theme: "dark",

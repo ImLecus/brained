@@ -1,8 +1,6 @@
 export const es = {
   "app.name": "Brained",
   "settings.title": "Configuración",
-  "settings.vault": "Bóveda (raíz)",
-  "settings.instructions": "AGENTS.md",
   "settings.model": "Modelo",
   "settings.language": "Idioma",
   "settings.theme": "Tema",

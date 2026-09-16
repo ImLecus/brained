@@ -3,8 +3,6 @@ import type { I18nKey } from "./es";
 export const en: Record<I18nKey, string> = {
   "app.name": "Brained",
   "settings.title": "Settings",
-  "settings.vault": "Vault (root)",
-  "settings.instructions": "AGENTS.md",
   "settings.model": "Model",
   "settings.language": "Language",
   "settings.theme": "Theme",

@@ -3,8 +3,6 @@ export type Language = "es" | "en";
 export type Theme = "light" | "dark";
 
 export interface AppConfig {
-  vaultPath: string;
-  instructionsPath: string;
   model: string;
   language: Language;
   theme: Theme;

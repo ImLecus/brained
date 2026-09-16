@@ -10,8 +10,6 @@ interface SettingsPanelProps {
 
 function defaultConfig(): AppConfig {
   return {
-    vaultPath: ".",
-    instructionsPath: "AGENTS.md",
     model: "opencode/big-pickle",
     language: "es",
     theme: "light",
@@ -44,22 +42,6 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
         onClick={(event) => event.stopPropagation()}
       >
         <h2>{t("settings.title")}</h2>
-        <label className="settings-field">
-          <span>{t("settings.vault")}</span>
-          <input
-            type="text"
-            value={draft.vaultPath}
-            onChange={(event) => setField("vaultPath", event.target.value)}
-          />
-        </label>
-        <label className="settings-field">
-          <span>{t("settings.instructions")}</span>
-          <input
-            type="text"
-            value={draft.instructionsPath}
-            onChange={(event) => setField("instructionsPath", event.target.value)}
-          />
-        </label>
         <label className="settings-field">
           <span>{t("settings.model")}</span>
           <input
