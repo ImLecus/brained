@@ -38,6 +38,16 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function errorMessage(error: unknown): string {
+  if (typeof error === "object" && error !== null && "data" in error) {
+    const data = (error as { data: unknown }).data;
+    if (typeof data === "object" && data !== null && "message" in data) {
+      return String((data as { message: unknown }).message);
+    }
+  }
+  return String(error);
+}
+
 function withTimeout<T>(promise: Promise<T>, ms: number, error: Error): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     const timer = setTimeout(() => reject(error), ms);
@@ -163,7 +173,7 @@ export class ChatManager {
       new PromptTimeoutError("prompt_timeout"),
     );
     if (result.error) {
-      throw new Error(`agente (request): ${String(result.error)}`);
+      throw new Error(`agente (request): ${errorMessage(result.error)}`);
     }
     const assistantID = (result.data as ChatMessageEnvelope | null)?.info?.id;
     if (!assistantID) {
@@ -183,7 +193,7 @@ export class ChatManager {
         return null;
       }
       if (message.info.error) {
-        throw new Error(`agente (reply): ${String(message.info.error)}`);
+        throw new Error(`agente (reply): ${errorMessage(message.info.error)}`);
       }
       if (messageText(message).length > 0 || message.info.time?.completed) {
         return { id: assistantID, text: messageText(message) };
@@ -220,7 +230,7 @@ export class ChatManager {
       query: { directory },
     });
     if (created.error) {
-      throw new Error(`agente (create): ${String(created.error)}`);
+      throw new Error(`agente (create): ${errorMessage(created.error)}`);
     }
     const id = created.data.id;
     this.sessionID = id;

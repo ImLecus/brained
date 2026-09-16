@@ -1,7 +1,7 @@
 {
 "name": "brained",
   "private": true,
-  "version": "1.1.0 snapshot",
+  "version": "1.0.1",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "AI powered second brain with a force-directed graph and a conversational agent over a Markdown vault",

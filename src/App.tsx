@@ -3,6 +3,7 @@ import type { GraphData, GraphNode } from "../shared/types";
 import { ConfigProvider, useConfig } from "./context/ConfigContext";
 import { useGraph } from "./hooks/useGraph";
 import { useI18n } from "./hooks/useI18n";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { GraphView } from "./components/GraphView";
 import { ChatPanel } from "./components/ChatPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
@@ -26,7 +27,7 @@ function resolveNode(target: string, graph: GraphData): GraphNode | undefined {
 function Workspace() {
   const { config } = useConfig();
   const { t } = useI18n();
-  const { graph, refresh } = useGraph();
+  const { graph, revision, refresh } = useGraph();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const refreshTimer = useRef<number | undefined>(undefined);
@@ -63,12 +64,14 @@ function Workspace() {
       </header>
       <main className="workspace">
         <section className="graph-pane">
-          <GraphView
-            graph={graph}
-            color={color}
-            invertColor={invertColor}
-            onNodeClick={setSelectedNode}
-          />
+          <ErrorBoundary resetKey={revision}>
+            <GraphView
+              graph={graph}
+              color={color}
+              invertColor={invertColor}
+              onNodeClick={setSelectedNode}
+            />
+          </ErrorBoundary>
         </section>
         <ChatPanel onFilesChanged={requestRefresh} />
       </main>
