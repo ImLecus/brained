@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useChat } from "../hooks/useChat";
 import { useI18n } from "../hooks/useI18n";
+import { useResizablePanel } from "../hooks/useResizablePanel";
+import { MarkdownRenderer } from "./renderer/MarkdownRenderer";
 import { SendIcon } from "./SendIcon";
 
 interface ChatPanelProps {
@@ -11,6 +13,9 @@ interface ChatPanelProps {
 export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
   const { t } = useI18n();
   const { messages, responding, notice, send, abort } = useChat(onFilesChanged);
+  const { size, startResize, onResize, endResize } = useResizablePanel(
+    () => Math.round(window.innerWidth * 0.3)
+  );
   const [draft, setDraft] = useState("");
   const lastMessage = messages[messages.length - 1];
   const showIndicator =
@@ -27,14 +32,24 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
   };
 
   return (
-    <aside className="chat">
+    <aside className="chat" style={{ width: size }}>
+      <div
+        className="chat-resizer"
+        onPointerDown={startResize}
+        onPointerMove={onResize}
+        onPointerUp={endResize}
+      />
       <ul className="chat-messages">
         {messages.length === 0 && !responding && (
           <li className="chat-empty">{t("chat.empty")}</li>
         )}
         {messages.map((message) => (
           <li key={message.id} className={`chat-message ${message.role}`}>
-            {message.content}
+            {message.role === "agent" ? (
+              <MarkdownRenderer text={message.content} />
+            ) : (
+              message.content
+            )}
           </li>
         ))}
         {showIndicator && (

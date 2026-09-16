@@ -3,8 +3,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 30vw;
-  min-width: 500px;
+  max-width: 100%;
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -12,6 +11,37 @@
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-left: 1px solid var(--line);
+}
+
+.chat-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 21;
+  width: 12px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.chat-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 5px;
+  width: 2px;
+  background: var(--line);
+  transition: background 0.15s ease;
+}
+
+.chat-resizer:hover::after {
+  background: var(--foreground);
+}
+
+body.resizing {
+  cursor: col-resize;
+  user-select: none;
 }
 
 .chat-messages {
@@ -49,6 +79,86 @@
 .chat-message.agent {
   align-self: flex-start;
   background: var(--line);
+}
+
+.chat-message.agent > div {
+  white-space: normal;
+}
+
+.chat-message.agent h1,
+.chat-message.agent h2,
+.chat-message.agent h3,
+.chat-message.agent h4,
+.chat-message.agent h5,
+.chat-message.agent h6 {
+  margin: 1em 0 0.4em;
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.chat-message.agent p {
+  margin: 0 0 0.75em;
+}
+
+.chat-message.agent p:last-child {
+  margin-bottom: 0;
+}
+
+.chat-message.agent ul,
+.chat-message.agent ol {
+  margin: 0 0 0.75em;
+  padding-left: 1.4em;
+}
+
+.chat-message.agent blockquote {
+  margin: 0 0 0.75em;
+  padding: 0 0 0 0.9em;
+  border-left: 2px solid var(--line);
+  color: var(--muted);
+}
+
+.chat-message.agent code {
+  font-family: monospace;
+  font-size: 0.9em;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+}
+
+.chat-message.agent pre {
+  margin: 0 0 0.75em;
+  padding: 0.8em;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+}
+
+.chat-message.agent pre code {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.chat-message.agent .wikilink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chat-message.agent .wikilink svg {
+  width: 0.8em;
+  height: 0.8em;
 }
 
 .chat-loading {

@@ -1,0 +1,115 @@
+.brain-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-background);
+}
+
+.brain-card {
+  width: 360px;
+  max-width: calc(100vw - 3rem);
+  padding: 2rem 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.brain-heading {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+}
+
+.brain-subtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+}
+
+.brain-tabs {
+  display: flex;
+  border: 1px solid var(--line);
+  margin-bottom: 1.25rem;
+}
+
+.brain-tabs button {
+  flex: 1;
+  padding: 0.6rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.brain-tabs button.active {
+  background: var(--foreground);
+  color: var(--surface);
+}
+
+.brain-field {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.brain-field span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.brain-field input,
+.brain-field select {
+  width: 100%;
+  padding: 0.6rem 0.65rem;
+  font: inherit;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.brain-field input:focus,
+.brain-field select:focus {
+  outline: none;
+  border-color: var(--foreground);
+}
+
+.brain-empty {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 1.25rem;
+}
+
+.brain-error {
+  font-size: 0.8rem;
+  color: var(--foreground);
+  border-left: 3px solid var(--foreground);
+  padding-left: 0.6rem;
+  margin: 0 0 1.25rem;
+}
+
+.brain-submit {
+  width: 100%;
+  padding: 0.7rem;
+  border: none;
+  background: var(--foreground);
+  color: var(--surface);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.brain-submit:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.brain-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

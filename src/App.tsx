@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { GraphData, GraphNode } from "../shared/types";
 import { ConfigProvider, useConfig } from "./context/ConfigContext";
 import { useGraph } from "./hooks/useGraph";
+import { useBrain } from "./hooks/useBrain";
 import { useI18n } from "./hooks/useI18n";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { GraphView } from "./components/GraphView";
@@ -9,6 +10,7 @@ import { ChatPanel } from "./components/ChatPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { SettingsIcon } from "./components/SettingsIcon";
 import { NodeModal } from "./components/NodeModal";
+import { BrainLoader } from "./components/BrainLoader";
 
 function resolveNode(target: string, graph: GraphData): GraphNode | undefined {
   const query = target.replace(/^\.\//, "").replace(/\.md$/, "").trim();
@@ -28,6 +30,7 @@ function Workspace() {
   const { config } = useConfig();
   const { t } = useI18n();
   const { graph, revision, refresh } = useGraph();
+  const brain = useBrain();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const refreshTimer = useRef<number | undefined>(undefined);
@@ -40,6 +43,12 @@ function Workspace() {
   };
 
   useEffect(() => {
+    if (brain.status?.loaded) {
+      void refresh();
+    }
+  }, [brain.status?.loaded, refresh]);
+
+  useEffect(() => {
     return () => {
       if (refreshTimer.current !== undefined) {
         window.clearTimeout(refreshTimer.current);
@@ -47,8 +56,12 @@ function Workspace() {
     };
   }, []);
 
-  if (!config) {
+  if (!config || brain.status === null) {
     return <div className="shell" />;
+  }
+
+  if (!brain.status.loaded) {
+    return <BrainLoader onCreate={brain.create} onOpen={brain.open} />;
   }
 
   const color = config.theme === "dark" ? "#ebebeb" : "#0d0d0d";
@@ -57,10 +70,15 @@ function Workspace() {
   return (
     <div className="shell">
       <header className="topbar">
-        <h1 className="brand">{t("app.name")}</h1>
-        <button className="topbar-action" onClick={() => setSettingsOpen(true)}>
-          <SettingsIcon />
-        </button>
+        <div className="topbar-left">
+          <h1 className="brand">{t("app.name")}</h1>
+          <button className="topbar-action" onClick={() => setSettingsOpen(true)}>
+            <SettingsIcon />
+          </button>
+          <button className="topbar-action" title={t("brain.close")} onClick={() => void brain.close()}>
+            {t("brain.close")}
+          </button>
+        </div>
       </header>
       <main className="workspace">
         <section className="graph-pane">

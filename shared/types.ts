@@ -3,11 +3,20 @@ export type Language = "es" | "en";
 export type Theme = "light" | "dark";
 
 export interface AppConfig {
-  vaultPath: string;
-  instructionsPath: string;
   model: string;
   language: Language;
   theme: Theme;
+}
+
+export interface BrainInfo {
+  name: string;
+  path: string;
+}
+
+export interface BrainStatus {
+  loaded: boolean;
+  name?: string;
+  path?: string;
 }
 
 export interface GraphNode {

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { GraphNode } from "../../shared/types";
 import { getNodeContent } from "../api/client";
 import { useI18n } from "../hooks/useI18n";
-import { Markdown } from "./markdown";
+import { CSVRenderer } from "./renderer/CSVRenderer";
+import { MarkdownRenderer } from "./renderer/MarkdownRenderer";
 
 interface NodeModalProps {
   node: GraphNode;
@@ -61,8 +62,10 @@ export function NodeModal({ node, onNavigate, onClose }: NodeModalProps) {
             <p className="modal-loading">{t("node.loading")}</p>
           ) : content.length === 0 ? (
             <p className="modal-empty">{t("node.empty")}</p>
+          ) : node.path.toLowerCase().endsWith(".csv") ? (
+            <CSVRenderer text={content} />
           ) : (
-            <Markdown text={content} onNavigate={onNavigate} />
+            <MarkdownRenderer text={content} onNavigate={onNavigate} />
           )}
         </div>
       </div>

@@ -108,6 +108,13 @@ export class ChatManager {
     }
   }
 
+  reset(): void {
+    this.manager = null;
+    this.sessionID = null;
+    this.directory = null;
+    this.aborted = false;
+  }
+
   private async drain(agents: AgentService, model: string): Promise<void> {
     const next = this.queue.shift();
     if (!next) {

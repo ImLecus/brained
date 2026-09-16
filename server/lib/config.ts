@@ -1,12 +1,13 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { homedir } from "node:os";
+import { join, resolve } from "node:path";
 import type { AppConfig } from "../../shared/types.ts";
+
+export const VAULT_DIR = join(homedir(), "brained");
 
 export const CONFIG_PATH = resolve("config.json");
 
 export const DEFAULT_CONFIG: AppConfig = {
-  vaultPath: ".",
-  instructionsPath: "AGENTS.md",
   model: "opencode/big-pickle",
   language: "es",
   theme: "light",
@@ -15,7 +16,13 @@ export const DEFAULT_CONFIG: AppConfig = {
 export async function loadConfig(): Promise<AppConfig> {
   try {
     const raw = await readFile(CONFIG_PATH, "utf8");
-    return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+    const loaded: AppConfig & { instructionsPath?: string; vaultPath?: string } = {
+      ...DEFAULT_CONFIG,
+      ...JSON.parse(raw),
+    };
+    delete loaded.instructionsPath;
+    delete loaded.vaultPath;
+    return loaded;
   } catch {
     return { ...DEFAULT_CONFIG };
   }
