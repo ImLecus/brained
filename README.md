@@ -4,8 +4,6 @@ An AI powered second brain application
 
 ## Installation
 
-**Note:** Opencode (> 1.18.x) must be installed in the system
-
 ### Installing the newest release
 
 You can install Brained by downloading the newest release `.AppImage` file. The unpacked version is also available.
@@ -23,7 +21,7 @@ The files will be available inside the `release/` directory.
 
 ## Setting up the second brain
 
-Brained stores all your data as `.md` files in `~/brained` (created automatically on first launch). The `AGENTS.md` file with the rules for the agent is embedded in the app and copied there, and your notes live inside `~/brained/content`. No configuration is needed.
+Brained stores all your data as `.md` or `.csv` files in `~/brained` (created automatically on first launch). The `AGENTS.md` file with the rules for the agent is embedded in the app and copied there, and your notes live inside `~/brained/content`. No configuration is needed.
 
 The application is available in English and Spanish.
 

@@ -1,6 +1,7 @@
 import { createOpencode } from "@opencode-ai/sdk";
 import { createServer } from "node:net";
 import type { EventBus } from "./events.js";
+import { ensureOpenCodeOnPath, resolveOpenCodeBin } from "./opencode-bin.js";
 
 export type OpenCodeInstance = Awaited<ReturnType<typeof createOpencode>>;
 
@@ -38,6 +39,10 @@ export class AgentService {
       return this.manager;
     }
     this.manager?.server.close();
+    ensureOpenCodeOnPath();
+    if (!process.env.BRAINED_OPENCODE_BIN) {
+      process.env.BRAINED_OPENCODE_BIN = resolveOpenCodeBin();
+    }
     const port = await freePort();
     const manager = await createOpencode({ port, config: { model } });
     const { stream } = await manager.client.event.subscribe({});
