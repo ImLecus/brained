@@ -1,5 +1,5 @@
 :root {
-  font-family: monospace,"Inter", system-ui, -apple-system, sans-serif;
+  font-family: monospace, "Inter", system-ui, -apple-system, sans-serif;
   color-scheme: light dark;
 }
 
@@ -36,6 +36,7 @@ button {
   position: absolute;
   top: 0;
   left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -48,6 +49,24 @@ button {
   font-weight: 600;
   letter-spacing: 0.02em;
   margin: 0.5rem;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.topbar-brain {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .topbar-action {

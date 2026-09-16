@@ -8,6 +8,17 @@ export interface AppConfig {
   theme: Theme;
 }
 
+export interface BrainInfo {
+  name: string;
+  path: string;
+}
+
+export interface BrainStatus {
+  loaded: boolean;
+  name?: string;
+  path?: string;
+}
+
 export interface GraphNode {
   id: string;
   title: string;

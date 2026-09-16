@@ -6,6 +6,7 @@ import fastifyStatic from "@fastify/static";
 import { loadConfig, VAULT_DIR } from "./lib/config.js";
 import { EventBus } from "./lib/events.js";
 import { AgentService } from "./lib/opencode.js";
+import { BrainService } from "./lib/brain.js";
 import { resolveOpenCodeBin } from "./lib/opencode-bin.js";
 import { registerApi } from "./routes/api.js";
 
@@ -16,7 +17,6 @@ const EMBEDDED_AGENTS = join(dirname(fileURLToPath(import.meta.url)), "instructi
 
 function ensureVault(): void {
   mkdirSync(VAULT_DIR, { recursive: true });
-  mkdirSync(join(VAULT_DIR, "content"), { recursive: true });
   copyFileSync(EMBEDDED_AGENTS, join(VAULT_DIR, "AGENTS.md"));
 }
 
@@ -39,6 +39,7 @@ async function start(): Promise<void> {
   const config = await loadConfig();
   const events = new EventBus();
   const agents = new AgentService(events);
+  const brain = new BrainService(events);
   const app = Fastify({ logger: true });
 
   const dist = resolve(process.env.BRAINED_DIST ?? "dist");
@@ -46,7 +47,7 @@ async function start(): Promise<void> {
     await app.register(fastifyStatic, { root: dist });
   }
 
-  await registerApi(app, { config, events, agents });
+  await registerApi(app, { config, events, agents, brain });
   await app.listen({ host: HOST, port: PORT });
   console.log(`BRAINED:READY http://${HOST}:${PORT}`);
 }
