@@ -28,20 +28,23 @@ async function buildGraph(
     files.map((file) => readFile(file, "utf8").catch(() => "")),
   );
   const nodes = new Map<string, GraphNode>();
-  const links = new Map<string, GraphLink>();
 
   for (let index = 0; index < files.length; index += 1) {
-    const file = files[index];
-    const id = documentId(file);
+    const id = documentId(files[index]);
     nodes.set(id, {
       id,
       title: id,
-      path: relative(rootPath, file),
+      path: relative(rootPath, files[index]),
     });
+  }
+
+  const links = new Map<string, GraphLink>();
+  for (let index = 0; index < files.length; index += 1) {
+    const id = documentId(files[index]);
     const content = contents[index];
     for (const match of content.matchAll(WIKILINK_PATTERN)) {
       const target = match[1].trim();
-      if (target.length > 0 && target !== id) {
+      if (target.length > 0 && target !== id && nodes.has(target)) {
         links.set(`${id}\u0000${target}`, { source: id, target });
       }
     }

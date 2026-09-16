@@ -1,7 +1,7 @@
 {
 "name": "brained",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "AI powered second brain with a force-directed graph and a conversational agent over a Markdown vault",
@@ -59,6 +59,7 @@
       "config.json"
     ],
     "linux": {
+      "icon": "src/assets/brained_rounded.png",
       "target": [
         "AppImage",
         "deb",
@@ -68,12 +69,14 @@
       "maintainer": "ImLecus <ImLecus@users.noreply.github.com>"
     },
     "win": {
+      "icon": "src/assets/brained_rounded.png",
       "target": [
         "portable",
         "nsis"
       ]
     },
     "mac": {
+      "icon": "src/assets/brained_rounded.png",
       "target": [
         "dmg",
         "zip"

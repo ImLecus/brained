@@ -66,6 +66,7 @@ async function spawnServer(port) {
 
   return new Promise((resolve, reject) => {
     let output = "";
+    let stderrOutput = "";
     const timer = setTimeout(() => {
       child.kill("SIGTERM");
       reject(new Error("server did not become ready in time"));
@@ -79,7 +80,11 @@ async function spawnServer(port) {
         return;
       }
       clearTimeout(timer);
-      reject(new Error(`server exited with code ${code}`));
+      const detail = stderrOutput.trim();
+      const message = detail
+        ? `server exited with code ${code}:\n${detail}`
+        : `server exited with code ${code}`;
+      reject(new Error(message));
     });
     child.stdout.on("data", (chunk) => {
       output += chunk.toString();
@@ -88,7 +93,9 @@ async function spawnServer(port) {
         resolve(child);
       }
     });
-    child.stderr.on("data", () => undefined);
+    child.stderr.on("data", (chunk) => {
+      stderrOutput += chunk.toString();
+    });
   });
 }
 

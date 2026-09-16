@@ -23,6 +23,7 @@ const PAN_SMOOTHING = 0.55;
 const PAN_THRESHOLD = 4;
 const NODE_REL_SIZE = 5;
 const HALO_PADDING = 3;
+const MIN_HALO_ZOOM = 0.25;
 const BASE_LINK_DISTANCE = 48;
 const DEGREE_SPACING = 3;
 
@@ -116,6 +117,7 @@ export const GraphView = memo(function GraphView({
     middle: null,
   });
   const nodeDragging = useRef(false);
+  const fitTimer = useRef<number | undefined>(undefined);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const degrees = useMemo(() => degreeMap(graph), [graph]);
   const nodeVal = useCallback(
@@ -144,7 +146,7 @@ export const GraphView = memo(function GraphView({
     }
     const radius =
       Math.sqrt(sizeValue(degrees.get(String(node.id)) ?? 0)) * NODE_REL_SIZE +
-      HALO_PADDING / globalScale;
+      HALO_PADDING / Math.max(globalScale, MIN_HALO_ZOOM);
     ctx.beginPath();
     ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
     ctx.fillStyle = color;
@@ -411,19 +413,53 @@ export const GraphView = memo(function GraphView({
     if (!handle) {
       return;
     }
-    window.setTimeout(() => {
+    if (fitTimer.current !== undefined) {
+      window.clearTimeout(fitTimer.current);
+    }
+    fitTimer.current = window.setTimeout(() => {
+      fitTimer.current = undefined;
       if (camera.current.touched) {
         return;
       }
+      if (graph.nodes.some((node) => {
+        const position = node as unknown as { x?: unknown; y?: unknown };
+        return (
+          typeof position.x !== "number" ||
+          typeof position.y !== "number" ||
+          !Number.isFinite(position.x) ||
+          !Number.isFinite(position.y)
+        );
+      })) {
+        return;
+      }
       handle.zoomToFit(0, 70);
+      const fittedK = handle.zoom();
+      if (!Number.isFinite(fittedK)) {
+        return;
+      }
+      const clampedK = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, fittedK));
       const center = handle.centerAt();
-      const fittedK = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, handle.zoom()));
-      handle.zoom(fittedK);
+      if (
+        !Number.isFinite(center.x) ||
+        !Number.isFinite(center.y)
+      ) {
+        return;
+      }
+      handle.zoom(clampedK);
       handle.centerAt(center.x, center.y);
-      camera.current.view = { k: fittedK, cx: center.x, cy: center.y };
-      camera.current.targetK = fittedK;
+      camera.current.view = { k: clampedK, cx: center.x, cy: center.y };
+      camera.current.targetK = clampedK;
     }, 0);
   }, [graph]);
+
+  useEffect(() => {
+    return () => {
+      if (fitTimer.current !== undefined) {
+        window.clearTimeout(fitTimer.current);
+        fitTimer.current = undefined;
+      }
+    };
+  }, []);
 
   return (
     <div ref={container} className="graph-area">
