@@ -15,6 +15,8 @@ const PORT = Number(process.env.PORT ?? 8300);
 const REQUIRED_SDK_VERSION = "1.18.30";
 const EMBEDDED_AGENTS = join(dirname(fileURLToPath(import.meta.url)), "instructions", "AGENTS.md");
 
+let brain: BrainService | null = null;
+
 function ensureVault(): void {
   mkdirSync(VAULT_DIR, { recursive: true });
   copyFileSync(EMBEDDED_AGENTS, join(VAULT_DIR, "AGENTS.md"));
@@ -39,7 +41,7 @@ async function start(): Promise<void> {
   const config = await loadConfig();
   const events = new EventBus();
   const agents = new AgentService(events);
-  const brain = new BrainService(events);
+  brain = new BrainService(events);
   const app = Fastify({ logger: true });
 
   const dist = resolve(process.env.BRAINED_DIST ?? "dist");
@@ -51,5 +53,19 @@ async function start(): Promise<void> {
   await app.listen({ host: HOST, port: PORT });
   console.log(`BRAINED:READY http://${HOST}:${PORT}`);
 }
+
+async function shutdown(): Promise<void> {
+  if (!brain) {
+    return;
+  }
+  try {
+    await brain.close();
+  } catch (error) {
+    console.error(`shutdown brain close failed: ${String(error)}`);
+  }
+}
+
+process.once("SIGINT", () => void shutdown());
+process.once("SIGTERM", () => void shutdown());
 
 void start();

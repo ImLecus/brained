@@ -12,7 +12,11 @@ export class EventBus {
 
   publish(event: unknown): void {
     for (const listener of this.listeners) {
-      listener(event);
+      try {
+        listener(event);
+      } catch (error) {
+        console.error(`event listener failed: ${String(error)}`);
+      }
     }
   }
 }

@@ -199,6 +199,12 @@ export async function registerApi(app: FastifyInstance, deps: ApiDeps): Promise<
     const unsubscribe = deps.events.subscribe((event) => {
       reply.raw.write(`data: ${JSON.stringify(event)}\n\n`);
     });
-    request.raw.on("close", unsubscribe);
+    const heartbeat = setInterval(() => {
+      reply.raw.write(":\n\n");
+    }, 15_000);
+    request.raw.on("close", () => {
+      clearInterval(heartbeat);
+      unsubscribe();
+    });
   });
 }
