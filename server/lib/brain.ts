@@ -7,7 +7,7 @@ import {
 } from "node:crypto";
 import { copyFileSync, existsSync, watch } from "node:fs";
 import type { FSWatcher } from "node:fs";
-import { readdir, readFile, rename, rm, writeFile, mkdir } from "node:fs/promises";
+import { copyFile, readdir, readFile, rename, rm, writeFile, mkdir } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import fg from "fast-glob";
 import { homedir } from "node:os";
@@ -16,6 +16,8 @@ import type { EventBus } from "./events.js";
 
 const BRAIN_DIR = join(homedir(), "brained");
 const WORK_DIR = join(BRAIN_DIR, ".work");
+const BACKUP_DIR = join(BRAIN_DIR, ".backups");
+const BACKUP_RETENTION_DAYS = 30;
 const MAGIC = Buffer.from("BRAINED1");
 const VERSION = 1;
 const SALT_LENGTH = 16;
@@ -120,6 +122,45 @@ async function materialize(state: BrainState): Promise<void> {
   }
 }
 
+function dailyStamp(date: Date): string {
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-");
+}
+
+async function pruneDailyBackups(name: string): Promise<void> {
+  const entries = await readdir(BACKUP_DIR).catch(() => [] as string[]);
+  const prefix = `${name}-`;
+  const cutoff = dailyStamp(new Date(Date.now() - BACKUP_RETENTION_DAYS * 24 * 60 * 60 * 1000));
+  for (const entry of entries) {
+    if (!entry.startsWith(prefix) || !entry.endsWith(".brain")) {
+      continue;
+    }
+    const stamp = entry.slice(prefix.length, -".brain".length);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(stamp)) {
+      continue;
+    }
+    if (stamp < cutoff) {
+      void rm(join(BACKUP_DIR, entry), { force: true });
+    }
+  }
+}
+
+async function keepDailyBackup(state: BrainState): Promise<void> {
+  if (!existsSync(state.path)) {
+    return;
+  }
+  await mkdir(BACKUP_DIR, { recursive: true });
+  const target = join(BACKUP_DIR, `${state.name}-${dailyStamp(new Date())}.brain`);
+  if (existsSync(target)) {
+    return;
+  }
+  await copyFile(state.path, target);
+  await pruneDailyBackups(state.name);
+}
+
 export class BrainService {
   private current: BrainState | null = null;
 
@@ -205,6 +246,11 @@ export class BrainService {
     if (!this.current) {
       return;
     }
+    if (this.current.files.size === 0) {
+      console.warn(`save skipped, keeping existing file: ${this.current.path}`);
+      return;
+    }
+    await keepDailyBackup(this.current);
     const blob = await encrypt(this.current, this.current.files);
     const temporary = `${this.current.path}.tmp`;
     await writeFile(temporary, blob);
