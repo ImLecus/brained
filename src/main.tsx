@@ -9,6 +9,7 @@ import "./styles/components/settings.css";
 import "./styles/components/node.css";
 import "./styles/components/brain.css";
 import "./styles/components/renderer.css";
+import "./styles/humanize/humanize.css"
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>

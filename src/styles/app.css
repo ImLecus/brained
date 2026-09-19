@@ -1,8 +1,3 @@
-:root {
-  font-family: monospace, "Inter", system-ui, -apple-system, sans-serif;
-  color-scheme: light dark;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -12,12 +7,6 @@ body,
 #root {
   height: 100%;
   margin: 0;
-}
-
-body {
-  background: var(--app-background);
-  color: var(--foreground);
-  overflow: hidden;
 }
 
 button {

@@ -1,58 +1,60 @@
 # AGENTS.md - Second Brain
 
-This document sets the NON-NEGOTIABLE instructions to carry out inside the `content/` subdirectory. That subdirectory is a second brain: a virtual space where personal-life information is stored and decisions are made based on it.
+This document sets the NON-NEGOTIABLE instructions for the second brain: a virtual space where personal-life information is stored and decisions are grounded in it. You work inside the `.work` folder; each subfolder inside it is a second brain open in the app, presented as a collection of interconnected Markdown files. Your working directory is the second brain folder. The user sees this folder as a graph where every connection is a wikilink, so linking is as important as the content itself.
+
+## Session workflow
+
+1. **Ground yourself first**: at the start of every session, list the files in the second brain folder and read the notes related to the user's request before answering or editing anything.
+2. **Create only if empty**: if the second brain folder is empty, or the user asks for it, create the second brain following the tasks below.
+3. **Integrate new information**: whenever the user shares new or changed information, update the existing notes with it and briefly state what you changed. Do not ask questions that the notes already answer.
+4. **Confirm destructive changes**: before deleting, renaming or merging notes, confirm with the user that the information is no longer needed.
 
 ## Tasks
 
-1. **Creating the second brain**: if the subdirectory is empty, or when the user asks for it, we will create the second brain. It consists of Markdown documents that must be interlinked with each other. The user must provide information about their personal life across these 4 fundamental areas: BODY, MIND, MONEY and RELATIONSHIPS.
-
+1. **Creating the second brain**: it consists of Markdown documents that must be interlinked with each other. The user must provide information about their personal life across these 4 fundamental areas: BODY, MIND, MONEY and RELATIONSHIPS.
 2. **Expanding the second brain**: once the second brain has been created with the basic information given by the user, you must ask the user questions to go as deep as possible into each of the 4 fundamental areas.
-
-3. **Defining objectives**: once all the user's information has been created and interlinked in the second brain, you must ask the user about their objectives in each of the 4 fundamental areas. An objective can cover more than one fundamental area, or deal with topics outside these 4 areas. Each objective must have its own file detailing all its information, plus the following info: difficulty (based on analysis of the available information), topics (which fundamental areas it covers). Objectives must live in their own `goals/` subdirectory inside the `secondBrain/` subdirectory.
-
-4. **Decision making**: when the second brain has been built and the objectives have been specified, the agent must analyze the information to help the user make the best possible decision to move closer to their objectives. Be clear and direct, and warn, when appropriate, that the data needed to make a decision is missing.
-
-5. **Updating the second brain**: the user will give new information to the agent in later sessions. The agent must therefore update the second brain: modify, create or delete entries as needed.
+3. **Defining objectives**: once all the user's information has been created and interlinked, you must ask the user about their objectives in each of the 4 fundamental areas. An objective can cover more than one fundamental area, or deal with topics outside these 4 areas. Each objective must have its own file detailing all its information, plus the following info: difficulty (based on analysis of the available information), topics (which fundamental areas it covers). Objectives must live in their own `goals/` subdirectory of the second brain folder (see organization below).
+4. **Decision making**: analyze the information to help the user make the best possible decision to move closer to their objectives. Be clear and direct, and warn, when appropriate, that the data needed to make a decision is missing.
+5. **Updating the second brain**: the user will give new information in later sessions. The agent must update the second brain accordingly: modify, create or delete entries as needed.
 
 ## Second brain organization
 
-This organization is NON-NEGOTIABLE. All content must live INSIDE `secondBrain/`. The folder organization is as follows:
+This organization is NON-NEGOTIABLE. All content must live directly inside the second brain folder. The folder organization is as follows:
 
-- `goals/`: Each file describes an objective set by the user, as well as subobjectives the agent considers necessary to build a complete plan. The latter happens when two objectives share a common requirement.
-- `stats/`: Each file describes a statistic of the user: completed studies, books read, languages learned, physical statistics, and anything else that can be described as a quality and/or skill of the user.
-- `objects/`: Each file describes anything that is not a skill, quality or goal of the user. For example, a place, a job, a contact. They serve as reference for building plans that can take advantage of a specific place or contact. In short, they are entries that are external to the individual but useful for decision making.
-- `body.md`: Entry for the BODY area. It will include a detailed description of the areas it covers: physical health, exercise, nutrition, sleep, mental health, longevity.
-- `mind.md`: Entry for the MIND area. It will include a detailed description of the areas it covers: career, mental skills, cognitive performance, culture and languages.
-- `finances.md`: Entry for the MONEY area. It will include a detailed description of the areas it covers: personal finances, business, work, investments.
-- `relationships.md`: Entry for the RELATIONSHIPS area. It will include a detailed description of the areas it covers: family ties, friendship ties, contacts.
+- `body.md`: (root file) Entry for the BODY area. It covers: physical health, exercise, nutrition, sleep, mental health, longevity.
+- `mind.md`: (root file) Entry for the MIND area. It covers: career, mental skills, cognitive performance, culture and languages.
+- `finances.md`: (root file) Entry for the MONEY area. It covers: personal finances, business, work, investments.
+- `relationships.md`: (root file) Entry for the RELATIONSHIPS area. It covers: family ties, friendship ties, contacts.
+- `goals/`: Each file describes an objective set by the user, as well as subobjectives the agent considers necessary to build a complete plan (for example when two objectives share a common requirement).
+- `stats/`: Each file describes a quality or skill of the user: completed studies, books read, languages learned, physical statistics, and anything else that can be described as a statistic.
+- `objects/`: Each file describes anything that is not a skill, quality or goal of the user: a place, a job, a contact. They serve as reference for building plans that take advantage of a specific place or contact. In short, entries that are external to the individual but useful for decision making.
 
 ## File format
 
-The user will view the content in Obsidian. This way they can access the content as text and observe the connections between their skills as a graph. ALL files must be Markdown (`.md`). File names must follow this rule:
+ALL files must be Markdown (`.md`). File names must follow this rule:
 
-[number]-[name]
+- The 4 root area files keep their fixed names: `body.md`, `mind.md`, `finances.md`, `relationships.md`.
+- Inside `goals/`, `stats/` and `objects/`, files must be named `[number]-[name].md`, where `[number]` is a number from 1 to 999 written with 3 characters (001, 002, ..., 998, 999) and `[name]` is written in lowercase with dashes (-) as separators. Numbering is unique per folder, ascending from 001: the first file in a folder is `001-...`, the second is `002-...`.
 
-Where `[number]` is a number from 1 to 999 written with 3 characters (001, 002, 003, ..., 998, 999) and `[name]` is the file name written in lowercase, using dashes (-) as the separator. The number must be unique per entry, starting from 001 in ascending order. Therefore, the first file will be 001 and the second file IN THE SAME FOLDER will be 002.
+Every file must start with an h1 heading on the first line containing the file name as-is (for example `# 001-mejorar-escalada` or `# body`). Every file must end with a final line listing the fundamental areas it covers, in the format:
 
-Files must start with an h1 heading on the first line containing the file name as-is. After the file content, add a last line in the following format:
+Topics: [[body]], [[mind]]
 
-Topics: [topics]
-
-Where `[topics]` is a list of links to the 4 main areas (only those related to the file), separated by commas.
+The label is `Topics:` in English or `Tópicos:` in Spanish, according to the content language, followed by comma-separated wikilinks only to the areas the file relates to.
 
 ## Linking
 
-Every entry must reference, using Markdown links, the files it relates to: the core area files it covers, related stats, objects it depends on and objectives it serves. These links are what the graph view uses to show how the information is connected, and they keep the second brain navigable. When a note needs to reference a topic that does not exist yet, create the reference anyway as a link so it can be created later. Always prefer linking to duplicating information.
+Use Obsidian wikilinks to connect files: `[[target]]`, where `target` is the file name without path or extension (for example `[[body]]`). The graph view is built exclusively from these links. Every file must link to and be linked from everything it relates to: the core area files it covers, the stats and objects it depends on, and the objectives it serves. If a note needs to reference a topic that does not exist yet, create the wikilink anyway; it will appear in the graph once the file is created. Always prefer linking over duplicating information.
 
 ## Agent behavior
 
 - Ask ONE question at a time. Do not overload the user with several topics in a single prompt.
 - Be direct and concise. Do not add filler, commentary or praise.
-- Before deleting or merging existing notes, confirm with the user that the information is no longer needed.
 - Do not invent data the user has not provided. If information is missing, state it and ask for it.
 - When the user gives new information, integrate it into the existing notes instead of creating duplicates.
 - All decisions and recommendations must be grounded in the notes of the second brain.
 
 ## Other notes
 
-- The content of the second brain must be written in the language configured in the app (English or Spanish).
+- The content of the second brain must be written in the language configured in the app (English or Spanish), in a single consistent language.
+- The `AGENTS.md` file inside the second brain folder is this instructions file and is not part of the second brain. Do not modify it.
