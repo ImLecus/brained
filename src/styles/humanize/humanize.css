@@ -48,6 +48,7 @@ button.h-circle-button {
     height: fit-content;
     display: inline-flex;
     cursor: pointer;
+    transition: all 0.25s ease-in-out;
 }
 
 .modal {

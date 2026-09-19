@@ -529,7 +529,6 @@ export const GraphView = memo(function GraphView({
                     backgroundColor="transparent"
                     nodeCanvasObjectMode={() => "replace"}
                     nodeCanvasObject={drawNode}
-                    linkCurvature={0}
                     linkColor={(link) =>
                         highlighted(link) ? color : withAlpha(color, 0.6)
                     }

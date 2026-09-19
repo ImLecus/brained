@@ -247,6 +247,7 @@ body.resizing {
     padding: 0.75rem;
     border-radius: 0.5rem;
     font: inherit;
+    outline: none;
 }
 
 .chat-actions {
@@ -267,6 +268,7 @@ body.resizing {
     border-radius: 0;
     cursor: pointer;
     gap: 10px;
+    transition: all 0.25s ease-in-out;
 }
 
 .chat-form button.chat-stop {
