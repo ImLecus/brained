@@ -74,11 +74,13 @@ body.resizing {
     align-self: flex-end;
     background: var(--foreground);
     color: var(--contrast);
+    border-radius: 0.75rem 0.75rem 0 0.75rem;
 }
 
 .chat-message.agent {
     align-self: flex-start;
     background: var(--line);
+    border-radius: 0.75rem 0.75rem 0.75rem 0;
 }
 
 .chat-message.agent > div {

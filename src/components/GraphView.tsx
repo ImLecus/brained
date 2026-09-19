@@ -179,12 +179,16 @@ export const GraphView = memo(function GraphView({
         ctx.fillStyle = isHovered ? invertColor : color;
         ctx.fill();
         const fontSize = 12 / globalScale;
-        ctx.font = `${fontSize}px sans-serif`;
+        ctx.font = `${fontSize}px monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.globalAlpha = labelOpacity(globalScale);
         ctx.fillStyle = color;
-        ctx.fillText(id, node.x, node.y + radius + LABEL_OFFSET / globalScale);
+        ctx.fillText(
+            id.toUpperCase(),
+            node.x,
+            node.y + radius + LABEL_OFFSET / globalScale,
+        );
         ctx.globalAlpha = 1;
     };
 
@@ -522,6 +526,7 @@ export const GraphView = memo(function GraphView({
                     backgroundColor="transparent"
                     nodeCanvasObjectMode={() => "replace"}
                     nodeCanvasObject={drawNode}
+                    linkCurvature={0}
                     linkColor={(link) =>
                         highlighted(link) ? color : withAlpha(color, 0.6)
                     }
