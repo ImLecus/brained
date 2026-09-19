@@ -49,3 +49,17 @@ button.h-circle-button {
     display: inline-flex;
     cursor: pointer;
 }
+
+.modal {
+    animation: fade-in 0.25s ease-out;
+    z-index: 10000;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}

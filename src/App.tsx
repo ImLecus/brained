@@ -73,20 +73,17 @@ function Workspace() {
         <div className="shell">
             <header className="topbar">
                 <div className="topbar-left">
-                    <SearchButton />
-                    <button
-                        className="h-circle-button topbar-action"
-                        onClick={() => setSettingsOpen(true)}
-                    >
-                        <SettingsIcon />
-                    </button>
-                </div>
-                <div className="topbar-right">
                     <button
                         className="h-circle-button topbar-action"
                         onClick={() => void brain.close()}
                     >
                         <CloseIcon />
+                    </button>
+                    <button
+                        className="h-circle-button topbar-action"
+                        onClick={() => setSettingsOpen(true)}
+                    >
+                        <SettingsIcon />
                     </button>
                 </div>
             </header>

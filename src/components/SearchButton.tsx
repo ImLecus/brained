@@ -1,6 +1,6 @@
 export default function SearchButton() {
     return (
-        <button className="h-circle-button">
+        <button className="h-circle-button topbar-action">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="24px"

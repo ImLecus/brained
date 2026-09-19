@@ -30,7 +30,7 @@ const HALO_PADDING = 3;
 const MIN_HALO_ZOOM = 0.25;
 const BASE_LINK_DISTANCE = 48;
 const DEGREE_SPACING = 3;
-const LABEL_FADE_MIN = 0.7;
+const LABEL_FADE_MIN = 0.6;
 const LABEL_FADE_MAX = 0.9;
 const LABEL_OFFSET = 6;
 
@@ -56,7 +56,7 @@ function clampZoom(value: number): number {
 }
 
 function sizeValue(degree: number): number {
-    return degree * 0.6 + 4;
+    return degree * 1.1 + 4;
 }
 
 function degreeMap(graph: GraphData) {
@@ -164,8 +164,8 @@ export const GraphView = memo(function GraphView({
         }
         const id = String(node.id);
         const isHovered = id === hovered;
-        const radius =
-            Math.sqrt(sizeValue(degrees.get(id) ?? 0)) * NODE_REL_SIZE;
+        const size = sizeValue(degrees.get(id) ?? 0);
+        const radius = Math.sqrt(size) * NODE_REL_SIZE;
         if (isHovered) {
             const haloRadius =
                 radius + HALO_PADDING / Math.max(globalScale, MIN_HALO_ZOOM);
@@ -176,7 +176,10 @@ export const GraphView = memo(function GraphView({
         }
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = isHovered ? invertColor : color;
+        ctx.fillStyle = withAlpha(
+            isHovered ? invertColor : color,
+            1 - 1 / size,
+        );
         ctx.fill();
         const fontSize = 12 / globalScale;
         ctx.font = `${fontSize}px monospace`;
@@ -530,9 +533,9 @@ export const GraphView = memo(function GraphView({
                     linkColor={(link) =>
                         highlighted(link) ? color : withAlpha(color, 0.6)
                     }
+                    linkWidth={(link) => (highlighted(link) ? 1.8 : 1)}
                     nodeVal={nodeVal}
                     nodeRelSize={NODE_REL_SIZE}
-                    linkWidth={(link) => (highlighted(link) ? 1.8 : 1)}
                     onNodeHover={(node) =>
                         setHovered(node ? String(node.id) : null)
                     }
