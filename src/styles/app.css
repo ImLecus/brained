@@ -1,98 +1,87 @@
-:root {
-  font-family: monospace, "Inter", system-ui, -apple-system, sans-serif;
-  color-scheme: light dark;
-}
-
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html,
 body,
 #root {
-  height: 100%;
-  margin: 0;
-}
-
-body {
-  background: var(--app-background);
-  color: var(--foreground);
-  overflow: hidden;
+    height: 100%;
+    margin: 0;
 }
 
 button {
-  font: inherit;
-  color: inherit;
+    font: inherit;
+    color: inherit;
 }
 
 .shell {
-  position: relative;
-  height: 100%;
-  overflow: hidden;
-  background: var(--app-background);
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    background: var(--app-background);
 }
 
 .topbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem 3rem;
 }
 
 .brand {
-  font-size: 1.3rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin: 0.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 0.5rem;
 }
 
 .topbar-left {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
 }
 
 .topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
 .topbar-brain {
-  font-size: 0.8rem;
-  color: var(--muted);
-  white-space: nowrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
 }
 
 .topbar-action {
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  color: var(--muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    color: var(--muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .topbar-action:hover {
-  color: var(--foreground);
+    color: var(--foreground);
 }
 
 .workspace {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  isolation: isolate;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    isolation: isolate;
 }
 
 .graph-pane {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
 }

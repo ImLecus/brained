@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useChat } from "../hooks/useChat";
 import { useI18n } from "../hooks/useI18n";
@@ -17,9 +17,17 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
     () => Math.round(window.innerWidth * 0.3)
   );
   const [draft, setDraft] = useState("");
+  const messagesRef = useRef<HTMLUListElement>(null);
   const lastMessage = messages[messages.length - 1];
   const showIndicator =
     responding && !(lastMessage?.role === "agent" && lastMessage.content.length > 0);
+
+  useEffect(() => {
+    const element = messagesRef.current;
+    if (element) {
+      element.scrollTop = element.scrollHeight;
+    }
+  }, [messages, responding]);
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
@@ -39,7 +47,7 @@ export function ChatPanel({ onFilesChanged }: ChatPanelProps) {
         onPointerMove={onResize}
         onPointerUp={endResize}
       />
-      <ul className="chat-messages">
+      <ul className="chat-messages" ref={messagesRef}>
         {messages.length === 0 && !responding && (
           <li className="chat-empty">{t("chat.empty")}</li>
         )}
