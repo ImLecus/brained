@@ -12,6 +12,7 @@ import { SettingsIcon } from "./components/SettingsIcon";
 import { NodeModal } from "./components/NodeModal";
 import { BrainLoader } from "./components/BrainLoader";
 import SearchButton from "./components/SearchButton";
+import CloseIcon from "./components/CloseIcon";
 
 function resolveNode(target: string, graph: GraphData): GraphNode | undefined {
     const query = target.replace(/^\.\//, "").replace(/\.md$/, "").trim();
@@ -73,19 +74,19 @@ function Workspace() {
             <header className="topbar">
                 <div className="topbar-left">
                     <SearchButton />
-                    <h1 className="brand">{t("app.name")}</h1>
                     <button
-                        className="topbar-action"
+                        className="h-circle-button topbar-action"
                         onClick={() => setSettingsOpen(true)}
                     >
                         <SettingsIcon />
                     </button>
+                </div>
+                <div className="topbar-right">
                     <button
-                        className="topbar-action"
-                        title={t("brain.close")}
+                        className="h-circle-button topbar-action"
                         onClick={() => void brain.close()}
                     >
-                        {t("brain.close")}
+                        <CloseIcon />
                     </button>
                 </div>
             </header>
